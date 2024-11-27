@@ -65,7 +65,7 @@ def updateJiraIssues(buildResult) {
       return
     }
 
-    echo "committedVersions: ${committedVersions}"
+    echo "committedVersions: ${committedVersions instanceof net.sf.json.JSONNull}"
     // echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
