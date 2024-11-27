@@ -48,7 +48,7 @@ def updateJiraIssues(buildResult) {
   issueKeys.each { issueKey ->
     echo "Processing JIRA issue: ${issueKey}"
 
-    def fields = getFields(issueKey)
+    // def fields = getFields(issueKey)
     // def currentStatus = fields.status.name
     // def committed_to = fields.customfield_11400
     // def committedVersion = committed_to.find { it.value == targetVersion}
@@ -66,12 +66,17 @@ def updateJiraIssues(buildResult) {
     // echo "committed_to: ${committed_to}"
     // echo "committedVersion: ${committedVersion}"
 
-    def transitions = getAvailableTransitions(issueKey)
-    echo "transitions: ${transitions}"
-    def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
+    // def transitions = getAvailableTransitions(issueKey)
+    // echo "transitions: ${transitions}"
+    // def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
     // def transition = transitions.find { it.name == targetTransition }
 
     // echo "Target Transition: ${targetTransition} / ${transition}"
+
+
+
+    getFields(issueKey)
+    getAvailableTransitions(issueKey)
   }
 }
 
@@ -93,14 +98,13 @@ def getIssueFromChanges() {
 }
 
 def getFields(issueKey) {
-  def res = _getFromJira("/issue/${issueKey}")
-  echo "fields: ${res.fields.customfield_11400}"
-  return res.fields
+  _getFromJira("/issue/${issueKey}")
+  // return res.fields
 }
 
 def getAvailableTransitions(issueKey) {
-  def res = _getFromJira("/issue/${issueKey}/transitions")
-  return res.transitions
+  _getFromJira("/issue/${issueKey}/transitions")
+  // return res.transitions
 }
 
 def _getFromJira(url_postfix) {
@@ -120,7 +124,7 @@ def _getFromJira(url_postfix) {
       returnStdout: true
     ).trim()
 
-    def json = new groovy.json.JsonSlurper().parseText(response)
-    return json
+    // def json = new groovy.json.JsonSlurper().parseText(response)
+    // return json
   }
 }
