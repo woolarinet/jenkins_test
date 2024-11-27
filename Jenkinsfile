@@ -48,7 +48,7 @@ def updateJiraIssues(buildResult) {
   issueKeys.each { issueKey ->
     echo "Processing JIRA issue: ${issueKey}"
 
-    // def fields = getFields(issueKey)
+    def fields = getFields(issueKey)
     // def currentStatus = fields.status.name
     // def committed_to = fields.customfield_11400
     // def committedVersion = committed_to.find { it.value == targetVersion}
