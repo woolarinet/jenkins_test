@@ -104,21 +104,3 @@ def _getFromJira(url_postfix) {
     return json
   }
 }
-
-
-
-def getTransitions():
-    url = "https://sippysoft.atlassian.net/rest/api/3/issue/SS-6298/transitions"
-
-
-    headers = {
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-    }
-    response = requests.request(
-      "GET",
-      url,
-      headers=headers,
-      auth=auth
-    )
-    print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
