@@ -50,7 +50,7 @@ def updateJiraIssues(buildResult) {
     def currentStatus = getCurrentStatus(issueKey)
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building."
-      if currentStatus == 'Testing' {
+      if (currentStatus == 'Testing') {
         //TODO: just committed to에 추가
       }
       return
