@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    JIRA_EMAIL = credentials('JIRA_EMAIL_CREDENTIAL_ID')
-    JIRA_API_TOKEN = credentials('JIRA_API_TOKEN')
+    JIRA_REST_API = 'https://sippysoft.atlassian.net/rest/api/3'
+    JIRA_AUTH = credentials('JIRA_AUTH')
   }
 
   stages {
@@ -44,6 +44,16 @@ def updateJiraIssues(buildResult) {
 
   def committedBranch = getBranchName()
   echo "Commited to ${committedBranch}"
+
+  issueKeys.each { issueKey ->
+    echo "Processing JIRA issue: ${issueKey}"
+
+    def currentStatus = getCurrentStatus(issueKey)
+    if (currentStatus != 'Building') {
+      echo "The issue's status is not building. Skip this step."
+      return
+    }
+  }
 }
 
 def getTicketNumberFromChanges() {
@@ -61,4 +71,17 @@ def getTicketNumberFromChanges() {
     }
   }
   return issueKeys.unique()
+}
+
+def getCurrentStatus(issueKey) {
+    def response = httpRequest(
+        httpMode: 'GET',
+        url: "${env.JIRA_REST_API}/issue/${issueKey}",
+        contentType: 'APPLICATION_JSON',
+        authentication: env.JIRA_AUTH,
+        validResponseCodes: '200'
+    )
+    
+    def issueData = readJSON text: response.content
+    return issueData.fields.status.name
 }
