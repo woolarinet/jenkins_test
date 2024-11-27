@@ -3,6 +3,7 @@ pipeline {
 
   environment {
     JIRA_REST_API = 'https://sippysoft.atlassian.net/rest/api/3'
+    // COMMITTED_TO_FIELD_ID = 'customfield_11400'
   }
 
   stages {
@@ -83,7 +84,7 @@ def getTicketNumberFromChanges() {
 
 def getCurrentStatus(issueKey) {
   def res = _getFromJira("/issue/${issueKey}")
-  echo "fields: ${res.fields}"
+  echo "fields: ${res.fields.customfield_11400}"
   return res.fields.status.name
 }
 
