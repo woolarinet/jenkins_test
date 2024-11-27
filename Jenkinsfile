@@ -53,7 +53,7 @@ def updateJiraIssues(buildResult) {
     //   return
     // }
 
-    // getAvailableTransitions(issueKey)
+    getAvailableTransitions(issueKey)
 
   }
 }
