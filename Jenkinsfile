@@ -55,11 +55,11 @@ def updateJiraIssues(buildResult) {
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building: ${currentStatus}"
       if (currentStatus == 'Testing') {
-        if (buildResult == 'SUCCESS' && !committedVersion) {
-            //TODO: just committed to에 추가
-            // changeStatus()
-            return
-        }
+        // if (buildResult == 'SUCCESS' && !committedVersion) {
+        //     //TODO: just committed to에 추가
+        //     // changeStatus()
+        //     return
+        // }
       }
       return
     }
