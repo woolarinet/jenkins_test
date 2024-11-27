@@ -49,29 +49,29 @@ def updateJiraIssues(buildResult) {
     echo "Processing JIRA issue: ${issueKey}"
 
     def fields = getFields(issueKey)
-    // def currentStatus = fields.status.name
-    // def committed_to = fields.customfield_11400
-    // def committedVersion = committed_to.find { it.value == targetVersion}
-    // if (currentStatus != 'Building') {
-    //   echo "The issue's status is not Building: ${currentStatus}"
-    //   if (currentStatus == 'Testing') {
-    //     if (buildResult == 'SUCCESS' && !committedVersion) {
-    //         //TODO: just committed to에 추가
-    //         // changeStatus()
-    //         return
-    //     }
-    //   }
-    //   return
-    // }
-    // echo "committed_to: ${committed_to}"
-    // echo "committedVersion: ${committedVersion}"
+    def currentStatus = fields.status.name
+    def committed_to = fields.customfield_11400
+    def committedVersion = committed_to.find { it.value == targetVersion}
+    if (currentStatus != 'Building') {
+      echo "The issue's status is not Building: ${currentStatus}"
+      if (currentStatus == 'Testing') {
+        if (buildResult == 'SUCCESS' && !committedVersion) {
+            //TODO: just committed to에 추가
+            // changeStatus()
+            return
+        }
+      }
+      return
+    }
+    echo "committed_to: ${committed_to}"
+    echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
     echo "transitions: ${transitions}"
     def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
-    // def transition = transitions.find { it.name == targetTransition }
+    def transition = transitions.find { it.name == targetTransition }
 
-    // echo "Target Transition: ${targetTransition} / ${transition}"
+    echo "Target Transition: ${targetTransition} / ${transition}"
   }
 }
 
