@@ -128,9 +128,10 @@ def _getFromJira(url_postfix) {
 
 def getCommittedVersion(committed, targetVersion) {
   for (version in committed) {
-    if (version.value == targetVersion) {
-      return version
-    }
+    echo "version: ${version}"
+    // if (version.value == targetVersion) {
+    //   return version
+    // }
   }
 
   return
