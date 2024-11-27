@@ -49,6 +49,7 @@ def updateJiraIssues(buildResult) {
     echo "Processing JIRA issue: ${issueKey}"
 
     def currentStatus = getCurrentStatus(issueKey)
+    echo "Current Status: ${currentStatus}"
     if (currentStatus != 'Building') {
       echo "The issue's status is not building. Skip this step."
       return
