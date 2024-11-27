@@ -45,13 +45,14 @@ def updateJiraIssues(buildResult) {
   def targetVersion = getBranchName()
   echo "Target version: ${targetVersion}"
 
-  issueKeys.each { issueKey ->
+  for (issueKey in issueKeys) {
     echo "Processing JIRA issue: ${issueKey}"
 
     def fields = getFields(issueKey)
     def currentStatus = fields.status.name
     def committed_to = fields.customfield_11400
-    def committedVersion = committed_to.find { it.value == targetVersion }
+    def committedVersion = getCommittedVersion(committed_to, targetVersion)
+
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building: ${currentStatus}"
       if (currentStatus == 'Testing') {
@@ -63,6 +64,7 @@ def updateJiraIssues(buildResult) {
       }
       return
     }
+
     echo "committed_to: ${committed_to}"
     echo "committedVersion: ${committedVersion}"
 
@@ -122,4 +124,14 @@ def _getFromJira(url_postfix) {
     def json = readJSON text: response
     return json
   }
+}
+
+def getCommittedVersion(committed, targetVersion) {
+  for (version in committed) {
+    if (version.value == targetVersion) {
+      return version
+    }
+  }
+
+  return
 }
