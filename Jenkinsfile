@@ -76,12 +76,12 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
-  res = _getFromJira("/issue/${issueKey}")
+  def res = _getFromJira("/issue/${issueKey}")
   return res.fields.status.name
 }
 
 def getAvailableTransitions(issueKey) {
-  res = _getFromJira("/issue/${issueKey}/transitions")
+  def res = _getFromJira("/issue/${issueKey}/transitions")
   echo "val: ${res.transitions}"
 }
 
