@@ -88,6 +88,6 @@ def getCurrentStatus(issueKey) {
     ).trim()
     echo "Response: ${response}"
 
-    def json = new JsonSlurper().parseText(response)
+    def json = new groovy.json.JsonSlurper().parseText(response)
     return json.fields.status.name
 }
