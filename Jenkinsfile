@@ -128,7 +128,7 @@ def _getFromJira(url_postfix) {
 
 def getCommittedVersion(committed, targetVersion) {
   echo "committed: ${committed} / ${!committed}"
-  if (!committed) {
+  if (committed == null) {
     return
   }
 
