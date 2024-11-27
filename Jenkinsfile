@@ -77,17 +77,21 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
+  withCredentials(
+    [string(credentialsId: 'JIRA_API_TOKEN_ID', variable: 'JIRA_API_TOKEN')],
+    [string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'JIRA_EMAIL_CREDENTIAL_ID')],
+    ) {
     def response = sh(
       script: """
       curl --request GET \
           --url '${env.JIRA_REST_API}/issue/${issueKey}' \
-          --user '${env.JIRA_EMAIL}:${env.JIRA_PASS}' \
+          --user '$JIRA_EMAIL_CREDENTIAL_ID:$JIRA_API_TOKEN' \
           --header 'Accept: application/json'
       """,
       returnStdout: true
     ).trim()
-    echo "Response: ${response}"
 
     def json = new groovy.json.JsonSlurper().parseText(response)
     return json.fields.status.name
+  }
 }
