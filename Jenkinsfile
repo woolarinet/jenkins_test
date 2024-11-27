@@ -65,7 +65,7 @@ def updateJiraIssues(buildResult) {
       return
     }
 
-    echo "alreadyCommitted: ${alreadyCommitted}"
+    echo "alreadyCommitted: ${alreadyCommitted} ${!alreadyCommitted}"
     // echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
