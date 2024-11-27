@@ -51,6 +51,7 @@ def updateJiraIssues(buildResult) {
     def fields = getFields(issueKey)
     def currentStatus = fields.status.name
     def committedVersions = fields.customfield_11400
+    echo "committedVersions nll? ${committedVersions == null}"
 
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building: ${currentStatus}"
@@ -73,6 +74,15 @@ def updateJiraIssues(buildResult) {
     def transition = transitions.find { it.name == targetTransition }
 
     echo "Target Transition: ${targetTransition} / ${transition}"
+    def transitionPayload = [
+      transition: [
+        id: transition.id
+      ]
+    ]
+
+    if (buildResult == 'SUCCESS') {
+      
+    }
   }
 }
 
