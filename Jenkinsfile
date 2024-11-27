@@ -51,7 +51,7 @@ def updateJiraIssues(buildResult) {
     def fields = getFields(issueKey)
     def currentStatus = fields.status.name
     def committed_to = fields.customfield_11400
-    def committedVersion = committed_to.find { it.value == targetVersion}
+    def committedVersion = _find(committed_to, 'value', targetVersion)
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building: ${currentStatus}"
       if (currentStatus == 'Testing') {
@@ -122,4 +122,14 @@ def _getFromJira(url_postfix) {
     def json = readJSON text: response
     return json
   }
+}
+
+def _find(list, field, target) {
+  for (o in list) {
+    if (o[field] == target) {
+      return o
+    }
+  }
+
+  return
 }
