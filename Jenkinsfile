@@ -35,20 +35,23 @@ def getBranchName() {
 }
 
 def updateJiraIssues(buildResult) {
-  def issueKeys = getTicketNumberFromChanges()
+  def issueKeys = getIssueFromChanges()
   if (issueKeys.isEmpty()) {
     echo "JIRA Issue Keys not found in commit messages. Skip this step."
     return
   }
   echo "Target issues: ${issueKeys}"
 
-  def committedBranch = getBranchName()
-  echo "Commited to ${committedBranch}"
+  def targetVersion = getBranchName()
+  echo "Target version: ${targetVersion}"
 
   issueKeys.each { issueKey ->
     echo "Processing JIRA issue: ${issueKey}"
 
-    def currentStatus = getCurrentStatus(issueKey)
+    def fields = getFields(issueKey)
+    def currentStatus = fields.status.name
+    def committed_to = fields.customfield_11400
+    def committedVersion = committed_to.find { it.value == targetVersion}
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building."
       if (currentStatus == 'Testing') {
@@ -56,6 +59,8 @@ def updateJiraIssues(buildResult) {
       }
       return
     }
+    echo "committed_to: ${committed_to}"
+    echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
     def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
@@ -65,7 +70,7 @@ def updateJiraIssues(buildResult) {
   }
 }
 
-def getTicketNumberFromChanges() {
+def getIssueFromChanges() {
   def changeLogSets = currentBuild.changeSets
   def issueKeys = []
 
@@ -82,15 +87,20 @@ def getTicketNumberFromChanges() {
   return issueKeys.unique()
 }
 
-def getCurrentStatus(issueKey) {
+def getFields(issueKey) {
   def res = _getFromJira("/issue/${issueKey}")
   echo "fields: ${res.fields.customfield_11400}"
-  return res.fields.status.name
+  return res.fields
 }
 
 def getAvailableTransitions(issueKey) {
   def res = _getFromJira("/issue/${issueKey}/transitions")
   return res.transitions
+}
+
+def getCommittedToPayload(committed_to) {
+  def payload
+  for (int i = 0; i < committed_to)
 }
 
 def _getFromJira(url_postfix) {
