@@ -51,7 +51,7 @@ def updateJiraIssues(buildResult) {
     def fields = getFields(issueKey)
     def currentStatus = fields.status.name
     def committedVersions = fields.customfield_11400
-    echo "committedVersions nll? ${committedVersions?.getClass()}"
+    def alreadyCommitted = committedVersions instanceof net.sf.json.JSONNull ? false : committedVersions.find { it.value == targetVersion }
 
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building: ${currentStatus}"
@@ -65,7 +65,7 @@ def updateJiraIssues(buildResult) {
       return
     }
 
-    echo "committedVersions: ${committedVersions instanceof net.sf.json.JSONNull}"
+    echo "alreadyCommitted: ${alreadyCommitted}"
     // echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
