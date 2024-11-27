@@ -3,9 +3,6 @@ pipeline {
 
   environment {
     JIRA_REST_API = 'https://sippysoft.atlassian.net/rest/api/3'
-    JIRA_AUTH = credentials('JIRA_AUTH')
-    JIRA_EMAIL = credentials('JIRA_EMAIL_CREDENTIAL_ID')
-    JIRA_PASS = credentials('JIRA_API_TOKEN')
   }
 
   stages {
@@ -51,11 +48,13 @@ def updateJiraIssues(buildResult) {
     echo "Processing JIRA issue: ${issueKey}"
 
     def currentStatus = getCurrentStatus(issueKey)
-    echo "Current Status: ${currentStatus}"
-    if (currentStatus != 'Building') {
-      echo "The issue's status is not building. Skip this step."
-      return
-    }
+    // if (currentStatus != 'Building') {
+    //   echo "The issue's status is not Building. Skip this step."
+    //   return
+    // }
+
+    getAvailableTransitions(issueKey)
+
   }
 }
 
@@ -77,21 +76,49 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
+  res = _getFromJira("/issue/${issueKey}")
+  return res.fields.status.name
+}
+
+def getAvailableTransitions(issueKey) {
+  res = _getFromJira("/issue/${issueKey}/transitions")
+  echo "val: ${res.transitions}"
+}
+
+def _getFromJira(url_postfix) {
   withCredentials([
-    string(credentialsId: 'JIRA_API_TOKEN', variable: 'API_TOKEN'),
-    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'JIRA_EMAIL')
+    string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
+    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
     ]) {
     def response = sh(
       script: """
       curl --request GET \
-          --url '${env.JIRA_REST_API}/issue/${issueKey}' \
-          --user '$JIRA_EMAIL:$API_TOKEN' \
+          --url '${env.JIRA_REST_API}${url_postfix}' \
+          --user '$USERNAME:$PASSWORD' \
           --header 'Accept: application/json'
       """,
       returnStdout: true
     ).trim()
 
     def json = new groovy.json.JsonSlurper().parseText(response)
-    return json.fields.status.name
+    return json
   }
 }
+
+
+
+def getTransitions():
+    url = "https://sippysoft.atlassian.net/rest/api/3/issue/SS-6298/transitions"
+
+
+    headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    }
+    response = requests.request(
+      "GET",
+      url,
+      headers=headers,
+      auth=auth
+    )
+    print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
