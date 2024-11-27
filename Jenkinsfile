@@ -48,19 +48,23 @@ def updateJiraIssues(buildResult) {
   issueKeys.each { issueKey ->
     echo "Processing JIRA issue: ${issueKey}"
 
-    def fields = getFields(issueKey)
-    def currentStatus = fields.status.name
-    def committed_to = fields.customfield_11400
-    def committedVersion = committed_to.find { it.value == targetVersion}
-    if (currentStatus != 'Building') {
-      echo "The issue's status is not Building."
-      if (currentStatus == 'Testing') {
-        //TODO: just committed to에 추가
-      }
-      return
-    }
-    echo "committed_to: ${committed_to}"
-    echo "committedVersion: ${committedVersion}"
+    // def fields = getFields(issueKey)
+    // def currentStatus = fields.status.name
+    // def committed_to = fields.customfield_11400
+    // def committedVersion = committed_to.find { it.value == targetVersion}
+    // if (currentStatus != 'Building') {
+    //   echo "The issue's status is not Building: ${currentStatus}"
+    //   if (currentStatus == 'Testing') {
+    //     if (buildResult == 'SUCCESS' && !committedVersion) {
+    //         //TODO: just committed to에 추가
+    //         // changeStatus()
+    //         return
+    //     }
+    //   }
+    //   return
+    // }
+    // echo "committed_to: ${committed_to}"
+    // echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
     echo "transitions: ${transitions}"
@@ -114,8 +118,6 @@ def _getFromJira(url_postfix) {
       """,
       returnStdout: true
     ).trim()
-
-    echo "RESPONSE: ${response}"
 
     def json = new groovy.json.JsonSlurper().parseText(response)
     return json
