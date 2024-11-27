@@ -63,10 +63,11 @@ def updateJiraIssues(buildResult) {
     echo "committedVersion: ${committedVersion}"
 
     def transitions = getAvailableTransitions(issueKey)
+    echo "transitions: ${transitions}"
     def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
-    def transition = transitions.find { it.name == targetTransition }
+    // def transition = transitions.find { it.name == targetTransition }
 
-    echo "Target Transition: ${targetTransition} / ${transition}"
+    // echo "Target Transition: ${targetTransition} / ${transition}"
   }
 }
 
