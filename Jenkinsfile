@@ -98,11 +98,6 @@ def getAvailableTransitions(issueKey) {
   return res.transitions
 }
 
-def getCommittedToPayload(committed_to) {
-  def payload
-  for (int i = 0; i < committed_to)
-}
-
 def _getFromJira(url_postfix) {
   withCredentials([
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
