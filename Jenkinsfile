@@ -74,6 +74,7 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
+    echo "JIRA_AUTH: ${JIRA_AUTH}"
     def response = httpRequest(
         httpMode: 'GET',
         url: "${env.JIRA_REST_API}/issue/${issueKey}",
@@ -81,7 +82,7 @@ def getCurrentStatus(issueKey) {
         authentication: env.JIRA_AUTH,
         validResponseCodes: '200'
     )
-    
+
     def issueData = readJSON text: response.content
     return issueData.fields.status.name
 }
