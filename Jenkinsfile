@@ -88,6 +88,6 @@ def getCurrentStatus(issueKey) {
     ).trim()
     echo "Response: ${response}"
 
-    // def issueData = readJSON text: response.content
-    // return issueData.fields.status.name
+    def json = new JsonSlurper().parseText(response)
+    return json.fields.status.name
 }
