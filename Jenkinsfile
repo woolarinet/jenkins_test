@@ -127,7 +127,7 @@ def _getFromJira(url_postfix) {
 }
 
 def getCommittedVersion(committed, targetVersion) {
-  if (!committed.length()) {
+  if (!committed.size()) {
     return
   }
 
