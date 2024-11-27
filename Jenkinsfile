@@ -77,10 +77,10 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
-  withCredentials(
-    [string(credentialsId: 'JIRA_API_TOKEN', variable: 'API_TOKEN')],
-    [string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'JIRA_EMAIL')],
-    ) {
+  withCredentials([
+    string(credentialsId: 'JIRA_API_TOKEN', variable: 'API_TOKEN'),
+    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'JIRA_EMAIL')
+    ]) {
     def response = sh(
       script: """
       curl --request GET \
