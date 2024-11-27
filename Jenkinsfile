@@ -78,14 +78,14 @@ def getTicketNumberFromChanges() {
 
 def getCurrentStatus(issueKey) {
   withCredentials(
-    [string(credentialsId: 'JIRA_API_TOKEN_ID', variable: 'JIRA_API_TOKEN')],
-    [string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'JIRA_EMAIL_CREDENTIAL_ID')],
+    [string(credentialsId: 'JIRA_API_TOKEN', variable: 'API_TOKEN')],
+    [string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'JIRA_EMAIL')],
     ) {
     def response = sh(
       script: """
       curl --request GET \
           --url '${env.JIRA_REST_API}/issue/${issueKey}' \
-          --user '$JIRA_EMAIL_CREDENTIAL_ID:$JIRA_API_TOKEN' \
+          --user '$JIRA_EMAIL:$API_TOKEN' \
           --header 'Accept: application/json'
       """,
       returnStdout: true
