@@ -51,7 +51,6 @@ def updateJiraIssues(buildResult) {
     def fields = getFields(issueKey)
     def currentStatus = fields.status.name
     def committed_to = fields.customfield_11400
-    def committedVersion = getCommittedVersion(committed_to, targetVersion)
 
     if (currentStatus != 'Building') {
       echo "The issue's status is not Building: ${currentStatus}"
@@ -71,7 +70,7 @@ def updateJiraIssues(buildResult) {
     def transitions = getAvailableTransitions(issueKey)
     echo "transitions: ${transitions}"
     def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
-    // def transition = transitions.find { it.name == targetTransition }
+    def transition = transitions.find { it.name == targetTransition }
 
     // echo "Target Transition: ${targetTransition} / ${transition}"
   }
@@ -123,19 +122,6 @@ def _getFromJira(url_postfix) {
 
     def json = readJSON text: response
     return json
-  }
-}
-
-def getCommittedVersion(committed, targetVersion) {
-  echo "committed: ${committed} / ${!committed}"
-  if (committed == null) {
-    return
-  }
-
-  for (version in committed) {
-    if (version.value == targetVersion) {
-      return version
-    }
   }
 }
 
