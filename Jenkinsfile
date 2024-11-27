@@ -77,15 +77,17 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
-    def auth = "${env.JIRA_EMAIL}:${env.JIRA_PASS}".bytes.encodeBase64().toString()
+    def response = sh(
+      script: """
+      curl --request GET \
+          --url '${env.JIRA_REST_API}/issue/${issueKey}' \
+          --user '${env.JIRA_EMAIL}:${env.JIRA_PASS}' \
+          --header 'Accept: application/json'
+      """,
+      returnStdout: true
+    ).trim()
+    echo "Response: ${response}"
 
-    def response = httpRequest(
-        httpMode: 'GET',
-        url: 'https://your-api-url.com/endpoint',
-        customHeaders: [[name: 'Authorization', value: "Basic ${auth}"]]
-    )
-    echo "Response: ${response.content}"
-
-    def issueData = readJSON text: response.content
-    return issueData.fields.status.name
+    // def issueData = readJSON text: response.content
+    // return issueData.fields.status.name
 }
