@@ -53,7 +53,7 @@ def updateJiraIssues(buildResult) {
     //   return
     // }
 
-    getAvailableTransitions(issueKey)
+    // getAvailableTransitions(issueKey)
 
   }
 }
@@ -90,6 +90,7 @@ def _getFromJira(url_postfix) {
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
     ]) {
+    echo "prefix: ${url_postfix}"
     def response = sh(
       script: """
       curl --request GET \
