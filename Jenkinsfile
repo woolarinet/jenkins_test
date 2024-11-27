@@ -109,6 +109,7 @@ def _getFromJira(url_postfix) {
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
     ]) {
     echo "postfix: ${url_postfix}"
+    echo "USERNAME / PASSWORD: $USERNAME / $PASSWORD"
     def response = sh(
       script: """
       curl --request GET \
