@@ -48,13 +48,19 @@ def updateJiraIssues(buildResult) {
     echo "Processing JIRA issue: ${issueKey}"
 
     def currentStatus = getCurrentStatus(issueKey)
-    // if (currentStatus != 'Building') {
-    //   echo "The issue's status is not Building. Skip this step."
-    //   return
-    // }
+    if (currentStatus != 'Building') {
+      echo "The issue's status is not Building."
+      if currentStatus == 'Testing' {
+        //TODO: just committed to에 추가
+      }
+      return
+    }
 
-    getAvailableTransitions(issueKey)
+    def transitions = getAvailableTransitions(issueKey)
+    def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
+    def transition = transitions.find { it.name == targetTransition }
 
+    echo "Target Transition: ${targetTransition} / ${transition}"
   }
 }
 
@@ -82,7 +88,7 @@ def getCurrentStatus(issueKey) {
 
 def getAvailableTransitions(issueKey) {
   def res = _getFromJira("/issue/${issueKey}/transitions")
-  echo "val: ${res.transitions}"
+  return res.transitions
 }
 
 def _getFromJira(url_postfix) {
