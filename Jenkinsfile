@@ -45,7 +45,7 @@ def updateJiraIssues(buildResult) {
   def targetVersion = getBranchName()
   echo "Target version: ${targetVersion}"
 
-  issueKeys.each { issueKey ->
+  for (issueKey in issueKeys) {
     echo "Processing JIRA issue: ${issueKey}"
 
     def fields = getFields(issueKey)
