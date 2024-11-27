@@ -104,7 +104,7 @@ def _getFromJira(url_postfix) {
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
     ]) {
-    echo "prefix: ${url_postfix}"
+    echo "postfix: ${url_postfix}"
     def response = sh(
       script: """
       curl --request GET \
@@ -114,6 +114,8 @@ def _getFromJira(url_postfix) {
       """,
       returnStdout: true
     ).trim()
+
+    echo "RESPONSE: ${response}"
 
     def json = new groovy.json.JsonSlurper().parseText(response)
     return json
