@@ -4,6 +4,8 @@ pipeline {
   environment {
     JIRA_REST_API = 'https://sippysoft.atlassian.net/rest/api/3'
     JIRA_AUTH = credentials('JIRA_AUTH')
+    JIRA_EMAIL = credentials('JIRA_EMAIL_CREDENTIAL_ID')
+    JIRA_PASS = credentials('JIRA_API_TOKEN')
   }
 
   stages {
@@ -75,14 +77,14 @@ def getTicketNumberFromChanges() {
 }
 
 def getCurrentStatus(issueKey) {
-    echo "JIRA_AUTH: ${JIRA_AUTH}"
+    def auth = "${env.JIRA_EMAIL}:${env.JIRA_PASS}".bytes.encodeBase64().toString()
+
     def response = httpRequest(
         httpMode: 'GET',
-        url: "${env.JIRA_REST_API}/issue/${issueKey}",
-        contentType: 'APPLICATION_JSON',
-        authentication: env.JIRA_AUTH,
-        validResponseCodes: '200'
+        url: 'https://your-api-url.com/endpoint',
+        customHeaders: [[name: 'Authorization', value: "Basic ${auth}"]]
     )
+    echo "Response: ${response.content}"
 
     def issueData = readJSON text: response.content
     return issueData.fields.status.name
