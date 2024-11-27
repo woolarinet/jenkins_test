@@ -119,7 +119,7 @@ def _getFromJira(url_postfix) {
       returnStdout: true
     ).trim()
 
-    def json = new groovy.json.JsonSlurper().parseText(response)
-    return new HashMap(json)
+    def json = readJSON text: response
+    return json
   }
 }
