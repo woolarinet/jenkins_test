@@ -107,7 +107,7 @@ def request_to_jira(url, auth, method="GET", headers={"Accept": "application/jso
 def issue_trasition(auth, i_issue, is_succeed, version):
     fields = _get_fields(auth, i_issue)
     current_status = fields["status"]["name"]
-    committed_versions = fields.get("customfield_11400", [])
+    committed_versions = fields.get("customfield_11400") or []
 
     if current_status != 'Building':
         print(f"The issue's status is not Building: {current_status}")
@@ -140,4 +140,4 @@ if __name__ == "__main__":
   is_succeed = True if result == "SUCCESS" else False
 
   for i_issue in i_issues:
-    issue_trasition(auth, i_issue, is_succeed, version)
+      issue_trasition(auth, i_issue, is_succeed, version)
