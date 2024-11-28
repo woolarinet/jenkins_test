@@ -1,3 +1,4 @@
+import re
 import sys
 import json
 import requests
@@ -134,8 +135,8 @@ if __name__ == "__main__":
   i_issues, result, version = sys.argv[1:4]
   userid, password = sys.argv[4:]
 
+  i_issues = re.sub(r'[\[\]]', '', i_issues).split(',')
   auth = HTTPBasicAuth(userid, password)
   is_succeed = True if result == "SUCCESS" else False
   print(auth, i_issues)
-  print(type(i_issues))
   # issue_trasition(auth, i_issue, is_succeed, version)
