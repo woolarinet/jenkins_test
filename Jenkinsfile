@@ -22,6 +22,7 @@ pipeline {
         . venv/bin/activate
         
         '''
+        exit(1)
       }
     }
   }
@@ -35,6 +36,7 @@ pipeline {
     }
     failure {
       script {
+        updateJiraIssues('FAILURE')
         echo "FAILURE"
       }
     }
