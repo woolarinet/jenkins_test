@@ -62,11 +62,7 @@ def updateJiraIssues(buildResult) {
   def targetVersion = getBranchName()
   echo "Target version: ${targetVersion}"
 
-  for (issueKey in issueKeys) {
-    echo "Processing JIRA issue: ${issueKey}"
-
-    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}"
-  }
+  sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKeys} ${buildResult} ${targetVersion}"
 }
 
 def getIssueFromChanges() {
