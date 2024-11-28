@@ -48,7 +48,7 @@ def updateJiraIssues(buildResult) {
   for (issueKey in issueKeys) {
     echo "Processing JIRA issue: ${issueKey}"
 
-    sh "${WORKSPACE}/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}"
+    sh "${WORKSPACE}/scripts/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}"
   }
 }
 
