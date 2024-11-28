@@ -137,4 +137,5 @@ if __name__ == "__main__":
   auth = HTTPBasicAuth(userid, password)
   is_succeed = True if result == "SUCCESS" else False
   print(auth, i_issues)
+  print(type(i_issues))
   # issue_trasition(auth, i_issue, is_succeed, version)
