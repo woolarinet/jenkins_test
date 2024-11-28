@@ -136,7 +136,7 @@ if __name__ == "__main__":
   userid, password = sys.argv[4:]
 
   auth = HTTPBasicAuth(userid, password)
-  i_issues = re.sub(r'[\[\]]', '', i_issues).split(',')
+  i_issues = re.sub(r'[\[\]\s]', '', i_issues).split(',')
   is_succeed = True if result == "SUCCESS" else False
 
   for i_issue in i_issues:
