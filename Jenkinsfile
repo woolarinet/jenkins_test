@@ -34,6 +34,7 @@ pipeline {
   post {
     success {
       script {
+        sh". venv/bin/activate"
         updateJiraIssues('SUCCESS')
         echo "SUCCESS"
       }
