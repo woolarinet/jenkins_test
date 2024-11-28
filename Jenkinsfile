@@ -50,7 +50,7 @@ def updateJiraIssues(buildResult) {
 
     sh "${WORKSPACE}/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}"
   }
-
+}
 
 def getIssueFromChanges() {
   def changeLogSets = currentBuild.changeSets
