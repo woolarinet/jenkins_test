@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/Users/sunho/.pyenv/shims/python3
 
 import sys
 import requests
