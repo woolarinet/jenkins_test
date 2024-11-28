@@ -135,8 +135,9 @@ if __name__ == "__main__":
   i_issues, result, version = sys.argv[1:4]
   userid, password = sys.argv[4:]
 
-  i_issues = re.sub(r'[\[\]]', '', i_issues).split(',')
   auth = HTTPBasicAuth(userid, password)
+  i_issues = re.sub(r'[\[\]]', '', i_issues).split(',')
   is_succeed = True if result == "SUCCESS" else False
-  print(auth, i_issues)
-  # issue_trasition(auth, i_issue, is_succeed, version)
+
+  for i_issue in i_issues:
+    issue_trasition(auth, i_issue, is_succeed, version)
