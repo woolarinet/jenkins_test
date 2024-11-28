@@ -16,6 +16,7 @@ pipeline {
       steps {
         script {
           sh "whoami"
+          sh "file ${WORKSPACE}/scripts/jira/jira.py"
         }
       }
     }
