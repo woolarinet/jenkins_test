@@ -15,7 +15,7 @@ pipeline {
     stage('Check User') {
       steps {
         script {
-          sh "whomai"
+          sh "whoami"
         }
       }
     }
