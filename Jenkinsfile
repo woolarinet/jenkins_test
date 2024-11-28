@@ -20,6 +20,15 @@ pipeline {
         }
       }
     }
+    stage('requests') {
+      steps {
+        sh '''
+        python -m venv venv
+        . venv/bin/activate
+        pip install requests
+        '''
+      }
+    }
   }
 
   post {
