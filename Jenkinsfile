@@ -48,43 +48,9 @@ def updateJiraIssues(buildResult) {
   for (issueKey in issueKeys) {
     echo "Processing JIRA issue: ${issueKey}"
 
-    def fields = getFields(issueKey)
-    def currentStatus = fields.status.name
-    def committedVersions = fields.customfield_11400
-    def alreadyCommitted = committedVersions instanceof net.sf.json.JSONNull ? false : committedVersions.find { it.value == targetVersion }
-
-    if (currentStatus != 'Building') {
-      echo "The issue's status is not Building: ${currentStatus}"
-      if (currentStatus == 'Testing') {
-        // if (buildResult == 'SUCCESS' && !committedVersion) {
-        //     //TODO: just committed to에 추가
-        //     // changeStatus()
-        //     return
-        // }
-      }
-      return
-    }
-
-    echo "alreadyCommitted: ${alreadyCommitted} ${!alreadyCommitted}"
-    // echo "committedVersion: ${committedVersion}"
-
-    def transitions = getAvailableTransitions(issueKey)
-    echo "transitions: ${transitions}"
-    def targetTransition = buildResult == 'SUCCESS' ? 'Testing' : 'Re Open'
-    def transition = transitions.find { it.name == targetTransition }
-
-    echo "Target Transition: ${targetTransition} / ${transition}"
-    def transitionPayload = [
-      transition: [
-        id: transition.id
-      ]
-    ]
-
-    if (buildResult == 'SUCCESS') {
-      
-    }
+    sh "${WORKSPACE}/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}"
   }
-}
+
 
 def getIssueFromChanges() {
   def changeLogSets = currentBuild.changeSets
@@ -101,40 +67,4 @@ def getIssueFromChanges() {
     }
   }
   return issueKeys.unique()
-}
-
-def getFields(issueKey) {
-  def res = _getFromJira("/issue/${issueKey}")
-  return res.fields
-}
-
-def getAvailableTransitions(issueKey) {
-  def res = _getFromJira("/issue/${issueKey}/transitions")
-  return res.transitions
-}
-
-def _getFromJira(url_postfix) {
-  withCredentials([
-    string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
-    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
-    ]) {
-    echo "postfix: ${url_postfix}"
-    echo "USERNAME / PASSWORD: $USERNAME / $PASSWORD"
-    def response = sh(
-      script: """
-      curl --request GET \
-          --url '${env.JIRA_REST_API}${url_postfix}' \
-          --user '$USERNAME:$PASSWORD' \
-          --header 'Accept: application/json'
-      """,
-      returnStdout: true
-    ).trim()
-
-    def json = readJSON text: response
-    return json
-  }
-}
-
-def getTargetTransitionId() {
-
 }
