@@ -12,6 +12,13 @@ pipeline {
         echo 'Building..'
       }
     }
+    stage('Check User') {
+      steps {
+        script {
+          sh "whomai"
+        }
+      }
+    }
   }
 
   post {
