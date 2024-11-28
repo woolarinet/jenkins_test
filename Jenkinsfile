@@ -49,7 +49,7 @@ def getBranchName() {
 }
 
 def updateJiraIssues(buildResult) {
-  def issueKeys = getIssueFromChanges()
+  def issueKeys = getIssuesFromChanges()
   if (issueKeys.isEmpty()) {
     echo "JIRA Issue Keys not found in commit messages. Skip this step."
     return
@@ -66,7 +66,7 @@ def updateJiraIssues(buildResult) {
   }
 }
 
-def getIssueFromChanges() {
+def getIssuesFromChanges() {
   def changeLogSets = currentBuild.changeSets
   def issueKeys = []
 
