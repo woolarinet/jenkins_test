@@ -34,10 +34,6 @@ pipeline {
   post {
     success {
       script {
-        sh'''
-        . venv/bin/activate
-        pip install requests
-        '''
         updateJiraIssues('SUCCESS')
         echo "SUCCESS"
       }
@@ -69,7 +65,10 @@ def updateJiraIssues(buildResult) {
   for (issueKey in issueKeys) {
     echo "Processing JIRA issue: ${issueKey}"
 
-    sh "python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}"
+    sh '''
+    source ./venv/bin/activate
+    python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKey} ${buildResult} ${targetVersion}
+    '''
   }
 }
 
