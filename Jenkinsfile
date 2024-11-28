@@ -23,7 +23,7 @@ pipeline {
     stage('requests') {
       steps {
         sh '''
-        python -m venv venv
+        python3 -m venv venv
         . venv/bin/activate
         pip install requests
         '''
