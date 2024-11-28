@@ -132,7 +132,7 @@ def issue_trasition(auth, i_issue, is_succeed, version):
 
 if __name__ == "__main__":
   i_issues, result, version = sys.argv[1:4]
-  url, userid, password = sys.argv[4:]
+  userid, password = sys.argv[4:]
 
   auth = HTTPBasicAuth(userid, password)
   is_succeed = True if result == "SUCCESS" else False
