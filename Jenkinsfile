@@ -1,11 +1,6 @@
 pipeline {
   agent any
 
-  environment {
-    JIRA_REST_API = 'https://sippysoft.atlassian.net/rest/api/3'
-    // COMMITTED_TO_FIELD_ID = 'customfield_11400'
-  }
-
   stages {
     stage('Build') {
       steps {
@@ -65,7 +60,7 @@ def updateJiraIssues(buildResult) {
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
   ]) {
-    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKeys} ${buildResult} ${targetVersion} $USERNAME $PASSWORD"
+    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py '${issueKeys}' ${buildResult} ${targetVersion} $USERNAME $PASSWORD"
   }
 }
 
