@@ -1,5 +1,3 @@
-#!/Users/sunho/.pyenv/shims/python3
-
 import sys
 import requests
 from requests.auth import HTTPBasicAuth
