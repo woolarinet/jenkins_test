@@ -61,8 +61,12 @@ def updateJiraIssues(buildResult) {
 
   def targetVersion = getBranchName()
   echo "Target version: ${targetVersion}"
-
-  sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKeys} ${buildResult} ${targetVersion}"
+  withCredentials([
+    string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
+    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
+  ]) {
+    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py ${issueKeys} ${buildResult} ${targetVersion} $USERNAME $PASSWORD"
+  }
 }
 
 def getIssueFromChanges() {
