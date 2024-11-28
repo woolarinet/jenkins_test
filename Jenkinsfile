@@ -25,7 +25,7 @@ pipeline {
         sh '''
         python3 -m venv venv
         . venv/bin/activate
-        pip install requests
+        
         '''
       }
     }
@@ -34,7 +34,10 @@ pipeline {
   post {
     success {
       script {
-        sh". venv/bin/activate"
+        sh'''
+        . venv/bin/activate
+        pip install requests
+        '''
         updateJiraIssues('SUCCESS')
         echo "SUCCESS"
       }
