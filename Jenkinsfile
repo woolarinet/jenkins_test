@@ -68,10 +68,11 @@ def updateJiraIssues(buildResult) {
 
 def getIssuesFromChanges() {
   def changeLogSets = getPreviousFaildBuilds()
+  echo "previous size: ${changeLogSets.size()}"
   changeLogSets.add(currentBuild.changeSets)
   def issueKeys = []
 
-  echo "${changeLogSets.size()}"
+  echo "current size: ${changeLogSets.size()}"
 
   for (int i = 0; i < changeLogSets.size(); i++) {
     def entries = changeLogSets[i].items
