@@ -87,7 +87,7 @@ def getSuccessfulBuildID() {
   def lastSuccessfulBuildID = 0
   def build = currentBuild.previousBuild
   echo "currentBuild: ${currentBuild}"
-  echo "previousBuild: ${previousBuild}"
+  echo "buildNumber: ${currentBuild.number}"
   // while (build != null) {
   //   if (build.result == "SUCCESS") {
   //     lastSuccessfulBuildID = build.id as Integer
