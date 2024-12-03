@@ -22,7 +22,6 @@ pipeline {
         . venv/bin/activate
         
         '''
-        exit(1)
       }
     }
   }
@@ -44,6 +43,7 @@ pipeline {
 }
 
 def getBranchName() {
+  echo scm
   String branch_name = scm.branches[0].name.split('/')[1]
   return branch_name
 }

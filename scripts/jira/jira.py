@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 import re
 import sys
 import json
@@ -29,18 +31,19 @@ def _get_committed_to_params(auth, is_succeed, committed_versions, version):
     targets = []
     params = {"fields": {"customfield_11400": targets}}
 
-    for committed_version in committed_versions:
+    for committed_version in committed_versions: # existing committed_to versions
         targets.append({"id": committed_version["id"]})
 
     if not is_succeed:
         return params
 
+    # current version
     targets += [{"id": v["id"]} for v in all_versions if v["value"].strip() == version.strip()]
     return params
 
 
 def _get_params(auth, is_succeed, committed_versions, version, transition=None):
-    if not is_succeed and transition:
+    if not is_succeed and transition: # when it's moved to Reopened
         return {"transition": {"id": transition["id"]}}
 
     params = {
@@ -50,7 +53,7 @@ def _get_params(auth, is_succeed, committed_versions, version, transition=None):
                       "body": {
                         "content": [{
                             "content": [{
-                                "text": f"buildupdate of {version} has been " + ("succeed" if is_succeed else "failed"),
+                                "text": f"The buildupdate of {version} has " + ("succeeded" if is_succeed else "failed"),
                                 "type": "text"
                             }],
                             "type": "paragraph"
@@ -69,7 +72,7 @@ def _get_params(auth, is_succeed, committed_versions, version, transition=None):
     return params
 
 
-def request_to_jira(url, auth, method="GET", headers={"Accept": "application/json"}, data=None, json=None):
+def request_to_jira(url, auth, method="GET", headers={"Accept": "application/json"}, data=None):
     """
     Sends an HTTP request to a JIRA API endpoint.
 
@@ -78,8 +81,7 @@ def request_to_jira(url, auth, method="GET", headers={"Accept": "application/jso
         auth (tuple): A tuple containing (username, password) or token.
         method (str): The HTTP method to use ("GET", "POST", "PUT", etc.).
         headers (dict): The request headers.
-        data (dict or str): The data to send in the request body (optional, for "application/x-www-form-urlencoded" or similar).
-        json (dict): The JSON data to send in the request body (optional).
+        data (dict or str): The data to send in the request body).
 
     Returns:
         dict: The JSON response parsed into a Python dictionary.
@@ -94,7 +96,6 @@ def request_to_jira(url, auth, method="GET", headers={"Accept": "application/jso
             headers=headers,
             auth=auth,
             data=data,
-            json=json
         )
 
         response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
@@ -114,6 +115,11 @@ def issue_trasition(auth, i_issue, is_succeed, version):
         if current_status != 'Testing' or not is_succeed:
             return
 
+        # If the current version is already added to 'committed_to', it just ends the process.
+        if next((v for v in committed_versions if v["value"].strip() == version.strip()), None):
+            return
+
+        # Add committed_to version only.
         params = _get_params(auth, is_succeed, committed_versions, version)
         return request_to_jira(f"/issue/{i_issue}", auth, "PUT", data=json.dumps(params))
 
@@ -123,7 +129,7 @@ def issue_trasition(auth, i_issue, is_succeed, version):
     params = _get_params(auth, is_succeed, committed_versions, version, transition)
     request_to_jira(f"/issue/{i_issue}/transitions", auth, "POST", data=json.dumps(params))
 
-    if not is_succeed: # leave a comment
+    if not is_succeed: # leave a comment when it's failed after transition
         request_to_jira(
             f"/issue/{i_issue}", auth, "PUT", data=json.dumps(
                 _get_params(auth, is_succeed, committed_versions, version)
