@@ -61,50 +61,34 @@ def updateJiraIssues(buildResult) {
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
   ]) {
-    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py '${issueKeys}' '${buildNumber}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD"
+    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD"
   }
 }
 
 def getIssuesFromChanges() {
   def changeLogSets = getPreviousFaildBuilds()
-  echo "previous size: ${changeLogSets.size()}"
+  echo "The number of failed builds before: ${changeLogSets.size()}"
   currentBuild.changeSets.each { cs -> changeLogSets.add(cs) }
+  
+
+  echo "The number of changes should be checked: ${changeLogSets.size()}"
   def issueKeys = []
-
-  echo "current size: ${changeLogSets.size()}"
-
+  echo "Checking commits ..."
   for (int i = 0; i < changeLogSets.size(); i++) {
-    echo "HERE1"
     def entries = changeLogSets[i].items
-    echo "HERE2"
-    echo "entries: ${entries} / ${entries.length}"
     for (int j = 0; j < entries.length; j++) {
-      echo "????"
       def commitMsg = entries[j].msg
-      echo "commitMsg: ${commitMsg}"
+      echo "Commit msg: ${commitMsg}"
       def matcher = commitMsg =~ /(SS-\d+)/
       if (matcher) {
           issueKeys.addAll(matcher.collect { it[1] })
       }
     }
   }
+  echo "===================="
   return issueKeys.unique()
 }
 
-def getSuccessfulBuildID() {
-  def lastSuccessfulBuildID = 0
-  def build = currentBuild.previousBuild
-  echo "currentBuild: ${currentBuild}"
-  echo "buildNumber: ${currentBuild.number}"
-  // while (build != null) {
-  //   if (build.result == "SUCCESS") {
-  //     lastSuccessfulBuildID = build.id as Integer
-  //     break
-  //   }
-  //   build = build.previousBuild
-  // }
-  // return lastSuccessfulBuildID
-}
 
 def getPreviousFaildBuilds() {
   def build = currentBuild.previousBuild
@@ -113,6 +97,7 @@ def getPreviousFaildBuilds() {
     if (build.result == "SUCCESS") {
       break
     }
+    echo "Last failed build number: ${build.number}"
     build.changeSets.each { changeSet -> changeSets.add(changeSet) }
     build = build.previousBuild
   }
