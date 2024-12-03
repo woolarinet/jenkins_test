@@ -79,6 +79,7 @@ def getIssuesFromChanges() {
     echo "HERE2"
     echo "entries: ${entries} / ${entries.length}"
     for (int j = 0; j < entries.length; j++) {
+      echo "????"
       def commitMsg = entries[j].msg
       echo "commitMsg: ${commitMsg}"
       def matcher = commitMsg =~ /(SS-\d+)/
