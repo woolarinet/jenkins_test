@@ -103,6 +103,7 @@ def updateJiraIssues(buildResult) {
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
   ]) {
     def debugOption = env.DEBUG_MODE == 'true' ? '-d' : ''
+    echo "\n\n\nWORKSPACE!! ${WORKSPACE}"
     sh "python3 -m venv venv;source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/transition.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD ${debugOption}"
   }
 }
