@@ -13,7 +13,7 @@ BASE_URL = "https://sippysoft.atlassian.net/rest/api/3"
 
 def debug(debug_mode, msg):
     if debug_mode:
-        print(f"[DEBUG] ${msg}")
+        print(f"[DEBUG] {msg}")
 
 
 def _get_fields(auth, i_issue):
@@ -161,12 +161,12 @@ if __name__ == "__main__":
     auth = HTTPBasicAuth(args.userid, args.password)
     i_issues = re.sub(r'[\[\]\s]', '', args.i_issues).split(',')
 
-    debug(args.debug, "[DEBUG] Arguments ===============================")
-    debug(args.debug, f"[DEBUG] Issues: {i_issues}")
-    debug(args.debug, f"[DEBUG] Build Number: {build_number}")
-    debug(args.debug, f"[DEBUG] Build Result: {build_result}")
-    debug(args.debug, f"[DEBUG] Version: {args.version}")
-    debug(args.debug, f"[DEBUG] UserID: {args.userid}\n\n")
+    debug(args.debug, "Arguments ===============================")
+    debug(args.debug, f"Issues: {i_issues}")
+    debug(args.debug, f"Build Number: {build_number}")
+    debug(args.debug, f"Build Result: {build_result}")
+    debug(args.debug, f"Version: {args.version}")
+    debug(args.debug, f"UserID: {args.userid}\n\n")
 
     for i_issue in i_issues:
         issue_trasition(auth, i_issue, is_succeed, args.version, build_number, args.debug)
