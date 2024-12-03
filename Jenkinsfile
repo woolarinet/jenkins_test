@@ -38,7 +38,7 @@ pipeline {
 
 
 def debug(msg) {
-  if (env.DEBUG_MODE == 'true') {
+  if (env.DEBUG_MODE) {
     echo "[DEBUG] ${msg}"
   }
 }
@@ -102,7 +102,7 @@ def updateJiraIssues(buildResult) {
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
   ]) {
-    def debugOption = env.DEBUG_MODE == 'true' ? '-d' : ''
+    def debugOption = env.DEBUG_MODE ? '-d' : ''
     echo "\n\n\nWORKSPACE!! ${WORKSPACE}"
     sh "python3 -m venv venv;source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/transition.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD ${debugOption}"
   }
