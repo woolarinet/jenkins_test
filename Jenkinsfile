@@ -68,7 +68,7 @@ def updateJiraIssues(buildResult) {
 def getIssuesFromChanges() {
   def changeLogSets = getPreviousFaildBuilds()
   echo "previous size: ${changeLogSets.size()}"
-  changeLogSets.add(currentBuild.changeSets)
+  currentBuild.changeSets.each { cs -> changeLogSets.add(cs) }
   def issueKeys = []
 
   echo "current size: ${changeLogSets.size()}"
@@ -113,7 +113,7 @@ def getPreviousFaildBuilds() {
     if (build.result == "SUCCESS") {
       break
     }
-    changeSets.add(build.changeSets)
+    build.changeSets.each { chageSet -> changeSets.add(changeSet) }
     build = build.previousBuild
   }
 
