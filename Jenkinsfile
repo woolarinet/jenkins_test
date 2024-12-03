@@ -15,6 +15,7 @@ pipeline {
           steps {
             echo 'Building..'
             script {
+              echo "\n\n\n${env.TEST_BUILD_RESULT}"
               if (env.TEST_BUILD_RESULT == "SUCCESS") {
                 exit 0
               }
@@ -102,6 +103,6 @@ def updateJiraIssues(buildResult) {
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
   ]) {
     def debugOption = env.DEBUG_MODE == 'true' ? '-d' : ''
-    sh "python3 -m venv venv;source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/transition.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD ${debugOption}"
+    sh "python3 -m venv venv;source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/transition.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD ${debugOption}"
   }
 }
