@@ -43,7 +43,7 @@ pipeline {
 }
 
 def getBranchName() {
-  echo scm
+  echo "${scm}"
   String branch_name = scm.branches[0].name.split('/')[1]
   return branch_name
 }
