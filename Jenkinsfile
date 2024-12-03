@@ -113,7 +113,7 @@ def getPreviousFaildBuilds() {
     if (build.result == "SUCCESS") {
       break
     }
-    build.changeSets.each { chageSet -> changeSets.add(changeSet) }
+    build.changeSets.each { changeSet -> changeSets.add(changeSet) }
     build = build.previousBuild
   }
 
