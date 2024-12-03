@@ -1,106 +1,103 @@
 pipeline {
-  agent any
+  agent none
 
   stages {
-    stage('Build') {
-      steps {
-        echo 'Building..'
-      }
+    stage('Wake up, builder-on-demand!') {
+      echo "Wake up process"
     }
-    stage('Check User') {
-      steps {
-        script {
-          sh "whoami"
-          sh "file ${WORKSPACE}/scripts/jira/jira.py"
+    stage('Acquire Node') {
+      stages {
+        stage('Build') {
+          steps {
+            echo 'Building..'
+            script {
+              if (env.TEST_BUILD_RESULT == "SUCCESS") {
+                exit 0
+              }
+              exit 1
+            }
+          }
         }
       }
-    }
-    stage('requests') {
-      steps {
-        sh '''
-        python3 -m venv venv
-        . venv/bin/activate
-        
-        '''
-      }
-    }
-  }
-
-  post {
-    success {
-      script {
-        updateJiraIssues('SUCCESS')
-        echo "SUCCESS"
-      }
-    }
-    failure {
-      script {
-        updateJiraIssues('FAILURE')
-        echo "FAILURE"
+      post {
+        success {
+          updateJiraIssues('SUCCESS')
+        }
+        failure {
+          updateJiraIssues('FAILURE')
+        }
       }
     }
   }
 }
+
+
+def debug(msg) {
+  if (env.DEBUG_MODE == 'true') {
+    echo "[DEBUG] ${msg}"
+  }
+}
+
 
 def getBranchName() {
   String branch_name = scm.branches[0].name.split('/')[1]
   return branch_name
 }
 
-def updateJiraIssues(buildResult) {
-  def issueKeys = getIssuesFromChanges()
-  if (issueKeys.isEmpty()) {
-    echo "JIRA Issue Keys not found in commit messages. Skip this step."
-    return
-  }
-  echo "Target issues: ${issueKeys}"
-
-  def targetVersion = getBranchName()
-  echo "Target version: ${targetVersion}"
-  withCredentials([
-    string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
-    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
-  ]) {
-    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD"
-  }
-}
 
 def getIssuesFromChanges() {
-  def changeLogSets = getPreviousFaildBuilds()
-  echo "The number of failed builds before: ${changeLogSets.size()}"
+  def changeLogSets = getPreviousFailedBuilds()
+  debug("The number of failed builds before: ${changeLogSets.size()}")
   currentBuild.changeSets.each { cs -> changeLogSets.add(cs) }
-  
+  debug("The number of changes should be checked: ${changeLogSets.size()}")
 
-  echo "The number of changes should be checked: ${changeLogSets.size()}"
   def issueKeys = []
-  echo "Checking commits ..."
+  debug("Checking commits ...")
   for (int i = 0; i < changeLogSets.size(); i++) {
     def entries = changeLogSets[i].items
     for (int j = 0; j < entries.length; j++) {
       def commitMsg = entries[j].msg
-      echo "Commit msg: ${commitMsg}"
+      debug("Commit msg: ${commitMsg}")
       def matcher = commitMsg =~ /(SS-\d+)/
       if (matcher) {
           issueKeys.addAll(matcher.collect { it[1] })
       }
     }
   }
-  echo "===================="
   return issueKeys.unique()
 }
 
 
-def getPreviousFaildBuilds() {
+def getPreviousFailedBuilds() {
   def build = currentBuild.previousBuild
   def changeSets = []
   while (build != null) {
     if (build.result == "SUCCESS") {
       break
     }
-    echo "Last failed build number: ${build.number}"
     build.changeSets.each { changeSet -> changeSets.add(changeSet) }
     build = build.previousBuild
   }
 
   return changeSets
+}
+
+
+def updateJiraIssues(buildResult) {
+  def issueKeys = getIssuesFromChanges()
+  if (issueKeys.isEmpty()) {
+    debug("JIRA Issue Keys not found in commit messages. Skip this step.")
+    return
+  }
+  debug("Target issues: ${issueKeys}")
+
+  def targetVersion = getBranchName()
+  debug("Target version: ${targetVersion}")
+  withCredentials([
+    string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
+    string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
+  ]) {
+    def debugOption = env.DEBUG_MODE == 'true' ? '-d' : ''
+    sh "python3 -m venv venv;source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/transition.py '${issueKeys}' '${currentBuild.number}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD ${debugOption}"
+  }
 }

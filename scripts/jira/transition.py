@@ -1,14 +1,19 @@
 #!/usr/local/bin/python
 
 import re
-import sys
 import json
+import argparse
 import requests
 
 from requests.auth import HTTPBasicAuth
 
 
 BASE_URL = "https://sippysoft.atlassian.net/rest/api/3"
+
+
+def debug(debug_mode, msg):
+    if debug_mode:
+        print(msg)
 
 
 def _get_fields(auth, i_issue):
@@ -42,7 +47,7 @@ def _get_committed_to_params(auth, is_succeed, committed_versions, version):
     return params
 
 
-def _get_params(auth, is_succeed, committed_versions, version, transition=None):
+def _get_params(auth, is_succeed, committed_versions, version, build_number, transition=None):
     if not is_succeed and transition: # when it's moved to Reopened
         return {"transition": {"id": transition["id"]}}
 
@@ -53,7 +58,7 @@ def _get_params(auth, is_succeed, committed_versions, version, transition=None):
                       "body": {
                         "content": [{
                             "content": [{
-                                "text": f"The buildupdate of {version} has " + ("succeeded" if is_succeed else "failed"),
+                                "text": f"The buildupdate(#{build_number}) of {version} has " + ("succeeded" if is_succeed else "failed"),
                                 "type": "text"
                             }],
                             "type": "paragraph"
@@ -105,48 +110,62 @@ def request_to_jira(url, auth, method="GET", headers={"Accept": "application/jso
         return None
 
 
-def issue_trasition(auth, i_issue, is_succeed, version):
+def issue_trasition(auth, i_issue, is_succeed, version, build_number, debug_mode):
     fields = _get_fields(auth, i_issue)
     current_status = fields["status"]["name"]
     committed_versions = fields.get("customfield_11400") or []
 
     if current_status != 'Building':
-        print(f"The issue's status is not Building: {current_status}")
+        debug(debug_mode, f"The issue's status is not Building: {current_status}")
         if current_status != 'Testing' or not is_succeed:
             return
 
         # If the current version is already added to 'committed_to', it just ends the process.
         if next((v for v in committed_versions if v["value"].strip() == version.strip()), None):
+            debug(debug_mode, f"Current version has been already added into 'committed_to'. Nothing to need to process.")
             return
 
         # Add committed_to version only.
-        params = _get_params(auth, is_succeed, committed_versions, version)
+        params = _get_params(auth, is_succeed, committed_versions, version, build_number)
         return request_to_jira(f"/issue/{i_issue}", auth, "PUT", data=json.dumps(params))
 
     transitions = _get_available_transitions(auth, i_issue)
     target_transition = "Testing" if is_succeed else "Re Open"
     transition = next((t for t in transitions if t["name"] == target_transition), None)
-    params = _get_params(auth, is_succeed, committed_versions, version, transition)
+    params = _get_params(auth, is_succeed, committed_versions, version, build_number, transition)
     request_to_jira(f"/issue/{i_issue}/transitions", auth, "POST", data=json.dumps(params))
 
     if not is_succeed: # leave a comment when it's failed after transition
         request_to_jira(
             f"/issue/{i_issue}", auth, "PUT", data=json.dumps(
-                _get_params(auth, is_succeed, committed_versions, version)
+                _get_params(auth, is_succeed, committed_versions, version, build_number)
             )
         )
 
 
 if __name__ == "__main__":
-    i_issues, result, version = sys.argv[1:4]
-    userid, password = sys.argv[4:]
+    parser = argparse.ArgumentParser(description="Jira Auto Transition Script")
+    parser.add_argument('i_issues', help='Comma-separated list of Jira issue keys (e.g., "[SS-123,SS-456]")')
+    parser.add_argument('result', help='Build result in the format "BUILD_NUMBER:RESULT" (e.g., "123:SUCCESS")')
+    parser.add_argument('version', help='Target version for transition (e.g., "master", "freightswitch", ...)')
+    parser.add_argument('userid', help='Jira user email')
+    parser.add_argument('password', help='Jira api token')
 
-    auth = HTTPBasicAuth(userid, password)
-    i_issues = re.sub(r'[\[\]\s]', '', i_issues).split(',')
-    result = result.split(":")
-    build_number = result[0]
-    is_succeed = True if result[1] == "SUCCESS" else False
+    parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
 
-    print(f"{build_number}: {is_succeed}")
+    args = parser.parse_args()
+    build_number, build_result = args.result.split(":")
+    is_succeed = build_result.upper() == "SUCCESS"
+
+    auth = HTTPBasicAuth(args.userid, args.password)
+    i_issues = re.sub(r'[\[\]\s]', '', args.i_issues).split(',')
+
+    debug(args.debug, "[DEBUG] Arguments ===============================")
+    debug(args.debug, f"[DEBUG] Issues: {i_issues}")
+    debug(args.debug, f"[DEBUG] Build Number: {build_number}")
+    debug(args.debug, f"[DEBUG] Build Result: {build_result}")
+    debug(args.debug, f"[DEBUG] Version: {args.version}")
+    debug(args.debug, f"[DEBUG] UserID: {args.userid}\n\n")
+
     for i_issue in i_issues:
-        issue_trasition(auth, i_issue, is_succeed, version)
+        issue_trasition(auth, i_issue, is_succeed, args.version, build_number, args.debug)
