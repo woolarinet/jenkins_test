@@ -62,11 +62,13 @@ def updateJiraIssues(buildResult) {
     string(credentialsId: 'JIRA_API_TOKEN', variable: 'PASSWORD'),
     string(credentialsId: 'JIRA_EMAIL_CREDENTIAL_ID', variable: 'USERNAME')
   ]) {
-    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py '${issueKeys}' ${buildResult} ${targetVersion} $USERNAME $PASSWORD"
+    sh "source ./venv/bin/activate;python3 ${WORKSPACE}/scripts/jira/jira.py '${issueKeys}' '${buildNumber}:${buildResult}' ${targetVersion} $USERNAME $PASSWORD"
   }
 }
 
 def getIssuesFromChanges() {
+  def chs = getPreviousFaildBuilds()
+  echo "${chs}"
   def changeLogSets = currentBuild.changeSets
   def issueKeys = []
 
@@ -96,4 +98,18 @@ def getSuccessfulBuildID() {
   //   build = build.previousBuild
   // }
   // return lastSuccessfulBuildID
+}
+
+def getPreviousFaildBuilds() {
+  def build = currentBuild.previousBuild
+  def changeSets = []
+  while (build != null) {
+    if (build.result == "SUCCESS") {
+      break
+    }
+    changeSets.add(build.changeSets)
+    build = build.previousBuild
+  }
+
+  return changeSets
 }
