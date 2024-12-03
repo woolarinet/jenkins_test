@@ -43,12 +43,12 @@ pipeline {
 }
 
 def getBranchName() {
-  echo "${scm}"
   String branch_name = scm.branches[0].name.split('/')[1]
   return branch_name
 }
 
 def updateJiraIssues(buildResult) {
+  getSuccessfulBuildID()
   def issueKeys = getIssuesFromChanges()
   if (issueKeys.isEmpty()) {
     echo "JIRA Issue Keys not found in commit messages. Skip this step."
@@ -81,4 +81,19 @@ def getIssuesFromChanges() {
     }
   }
   return issueKeys.unique()
+}
+
+def getSuccessfulBuildID() {
+  def lastSuccessfulBuildID = 0
+  def build = currentBuild.previousBuild
+  echo "currentBuild: ${currentBuild}"
+  echo "previousBuild: ${previousBuild}"
+  // while (build != null) {
+  //   if (build.result == "SUCCESS") {
+  //     lastSuccessfulBuildID = build.id as Integer
+  //     break
+  //   }
+  //   build = build.previousBuild
+  // }
+  // return lastSuccessfulBuildID
 }
