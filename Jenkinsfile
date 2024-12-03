@@ -48,7 +48,6 @@ def getBranchName() {
 }
 
 def updateJiraIssues(buildResult) {
-  getSuccessfulBuildID()
   def issueKeys = getIssuesFromChanges()
   if (issueKeys.isEmpty()) {
     echo "JIRA Issue Keys not found in commit messages. Skip this step."
@@ -78,6 +77,7 @@ def getIssuesFromChanges() {
     echo "HERE1"
     def entries = changeLogSets[i].items
     echo "HERE2"
+    echo "entries: ${entries} / ${entries.length}"
     for (int j = 0; j < entries.length; j++) {
       def commitMsg = entries[j].msg
       echo "commitMsg: ${commitMsg}"
