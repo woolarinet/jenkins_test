@@ -13,7 +13,7 @@ BASE_URL = "https://sippysoft.atlassian.net/rest/api/3"
 
 def debug(debug_mode, msg):
     if debug_mode:
-        print(msg)
+        print(f"[DEBUG] ${msg}")
 
 
 def _get_fields(auth, i_issue):
