@@ -17,9 +17,9 @@ pipeline {
             script {
               echo "\n\n\n${env.TEST_BUILD_RESULT}"
               if (env.TEST_BUILD_RESULT == "SUCCESS") {
-                exit 0
+                return
               }
-              exit 1
+              error "Failed"
             }
           }
         }
