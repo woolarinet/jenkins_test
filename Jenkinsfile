@@ -78,6 +78,7 @@ def getIssuesFromChanges() {
     def entries = changeLogSets[i].items
     for (int j = 0; j < entries.length; j++) {
       def commitMsg = entries[j].msg
+      echo "commitMsg: ${commitMsg}"
       def matcher = commitMsg =~ /(SS-\d+)/
       if (matcher) {
           issueKeys.addAll(matcher.collect { it[1] })
