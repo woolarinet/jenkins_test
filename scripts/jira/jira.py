@@ -138,12 +138,15 @@ def issue_trasition(auth, i_issue, is_succeed, version):
 
 
 if __name__ == "__main__":
-  i_issues, result, version = sys.argv[1:4]
-  userid, password = sys.argv[4:]
+    i_issues, result, version = sys.argv[1:4]
+    userid, password = sys.argv[4:]
 
-  auth = HTTPBasicAuth(userid, password)
-  i_issues = re.sub(r'[\[\]\s]', '', i_issues).split(',')
-  is_succeed = True if result == "SUCCESS" else False
+    auth = HTTPBasicAuth(userid, password)
+    i_issues = re.sub(r'[\[\]\s]', '', i_issues).split(',')
+    result = result.split(":")
+    build_number = result[0]
+    is_succeed = True if result[1] == "SUCCESS" else False
 
-  for i_issue in i_issues:
-      issue_trasition(auth, i_issue, is_succeed, version)
+    print(f"{build_number}: {is_succeed}")
+    for i_issue in i_issues:
+        issue_trasition(auth, i_issue, is_succeed, version)
