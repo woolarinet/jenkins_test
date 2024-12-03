@@ -142,6 +142,7 @@ def issue_trasition(auth, i_issue, is_succeed, version, build_number, debug_mode
             )
         )
 
+    debug(debug_mode, "The transition is completed.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jira Auto Transition Script")
