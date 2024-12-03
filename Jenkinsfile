@@ -3,7 +3,11 @@ pipeline {
 
   stages {
     stage('Wake up, builder-on-demand!') {
-      echo "Wake up process"
+      steps {
+        script {
+          echo "Wake up process"
+        }
+      }
     }
     stage('Acquire Node') {
       stages {
