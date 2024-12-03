@@ -75,7 +75,9 @@ def getIssuesFromChanges() {
   echo "current size: ${changeLogSets.size()}"
 
   for (int i = 0; i < changeLogSets.size(); i++) {
+    echo "HERE1"
     def entries = changeLogSets[i].items
+    echo "HERE2"
     for (int j = 0; j < entries.length; j++) {
       def commitMsg = entries[j].msg
       echo "commitMsg: ${commitMsg}"
